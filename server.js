@@ -23,6 +23,7 @@ app.use(
     origin: ["http://localhost:3000","https://pc-frontend-vy53.vercel.app/"], 
     methods: ["GET,POST"],
     allowedHeaders: ["Content-Type,Authorization"],
+    credentials: true,
   })
 );
 
