@@ -16,12 +16,16 @@ const cors = require("cors");
 // OR (Recommended) - Enable CORS for only frontend origin
 app.use(
   cors({
-    origin: ["http://localhost:3000","https://pc-frontend-vy53.vercel.app/"], 
-    methods: ["GET,POST"],
-    allowedHeaders: ["Content-Type,Authorization"],
-    credentials: true,
+    origin: [
+      "http://localhost:3000",
+      "https://pc-frontend-vy53.vercel.app"
+    ],
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true
   })
 );
+
 
 // Middleware
 app.use(express.json());
