@@ -15,12 +15,12 @@ const cors = require("cors");
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+
 
 // OR (Recommended) - Enable CORS for only frontend origin
 app.use(
   cors({
-    origin: "http://localhost:3000", // Allow requests from frontend
+    origin: ["http://localhost:3000","https://pc-frontend-vy53.vercel.app/"], 
     methods: "GET,POST",
     allowedHeaders: "Content-Type,Authorization",
   })
@@ -101,28 +101,28 @@ app.get("/fetch-emails", async (req, res) => {
 
               const headers = msg.data.payload.headers;
 
-              // ✅ Extract Subject and Snippet
+             
               const subject = headers.find(header => header.name === "Subject")?.value || "No Subject";
               const snippet = msg.data.snippet || "";
               const messageId = msg.data.id; // Unique message ID
 
-              // ✅ Extract and Clean the Email Received Date
+              
               const emailDateHeader = headers.find(header => header.name === "Date")?.value || "";
               const rawReceivedDate = new Date(emailDateHeader).toDateString(); // Converts to readable format
               const receivedDate = cleanReceivedDate(rawReceivedDate); // Removes weekdays
 
-              // ✅ Filter Emails Based on Keywords (Placement, Internship, Interview)
+             
               if (!/\b(interview|placement|internship|test link)\b/i.test(subject)) {
                   return null;
               }
 
-              // ✅ Extract Deadline Details
+              
               const extractedDetails = extractDetails(subject + " " + snippet);
               if (!extractedDetails) return null;
 
               console.log("Extracted Email Data:", extractedDetails);
 
-              // ✅ Store Email Data in MongoDB
+              
               const email = await Email.findOneAndUpdate(
                   { messageId },
                   { 
@@ -130,7 +130,7 @@ app.get("/fetch-emails", async (req, res) => {
                           SUBJECT: subject, 
                           DATE: receivedDate,  
                           DEADLINE: extractedDetails.DEADLINE || [],
-                          messageId: messageId  // ✅ Storing messageId in MongoDB
+                          messageId: messageId  // 
                       } 
                   },
                   { upsert: true, new: true }  // Insert if not exists
@@ -140,7 +140,7 @@ app.get("/fetch-emails", async (req, res) => {
                   SUBJECT: subject,
                   DATE: receivedDate,  
                   DEADLINE: extractedDetails.DEADLINE || [],
-                  messageId: messageId  // ✅ Sending messageId in the response
+                  messageId: messageId  // 
               };
           })
       );
