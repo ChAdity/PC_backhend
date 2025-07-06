@@ -13,10 +13,6 @@ const { extractDetails } = require("./nlpProcessor");
 const app = express();
 const cors = require("cors");
 
-// Middleware
-app.use(express.json());
-
-
 // OR (Recommended) - Enable CORS for only frontend origin
 app.use(
   cors({
@@ -26,6 +22,12 @@ app.use(
     credentials: true,
   })
 );
+
+// Middleware
+app.use(express.json());
+
+
+
 
 app.use((req, res, next) => {
   console.log(req.path, req.method);
