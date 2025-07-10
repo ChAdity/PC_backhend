@@ -13,7 +13,6 @@ const { extractDetails } = require("./nlpProcessor");
 const app = express();
 const cors = require("cors");
 
-// OR (Recommended) - Enable CORS for only frontend origin
 app.use(
   cors({
     origin: [
@@ -26,22 +25,15 @@ app.use(
   })
 );
 
-
-// Middleware
 app.use(express.json());
-
-
-
 
 app.use((req, res, next) => {
   console.log(req.path, req.method);
   next();
 });
 
-// Routes
 app.use("/api/user", userRoutes);
 
-// Google OAuth Routes
 app.get("/auth/google", (req, res) => {
   res.redirect(getAuthUrl());
 });
@@ -59,11 +51,6 @@ app.get("/auth/google/callback", async (req, res) => {
 
     if (!email) return res.status(500).json({ error: "Failed to fetch user email" });
 
-    // let user = await User.findOne({ email });
-    // if (!user) {
-    //   user = new User({ email });
-    //   await user.save();
-    // }
     let user = await User.findOne({ email });
 
     if (!user) {
@@ -81,17 +68,13 @@ app.get("/auth/google/callback", async (req, res) => {
   }
 });
 
- 
 
-
-
-// Fetch Emails and Apply regex 
 app.get("/fetch-emails", async (req, res) => {
   try {
       const gmail = getGmailClient();
       const response = await gmail.users.messages.list({
           userId: "me",
-          maxResults: 200, // Fetch up to 1000 emails
+          maxResults: 200, 
       });
 
       const messages = response.data.messages || [];
@@ -111,12 +94,12 @@ app.get("/fetch-emails", async (req, res) => {
              
               const subject = headers.find(header => header.name === "Subject")?.value || "No Subject";
               const snippet = msg.data.snippet || "";
-              const messageId = msg.data.id; // Unique message ID
+              const messageId = msg.data.id; 
 
               
               const emailDateHeader = headers.find(header => header.name === "Date")?.value || "";
-              const rawReceivedDate = new Date(emailDateHeader).toDateString(); // Converts to readable format
-              const receivedDate = cleanReceivedDate(rawReceivedDate); // Removes weekdays
+              const rawReceivedDate = new Date(emailDateHeader).toDateString(); 
+              const receivedDate = cleanReceivedDate(rawReceivedDate); 
 
              
               if (!/\b(interview|placement|internship|test link)\b/i.test(subject)) {
@@ -137,10 +120,10 @@ app.get("/fetch-emails", async (req, res) => {
                           SUBJECT: subject, 
                           DATE: receivedDate,  
                           DEADLINE: extractedDetails.DEADLINE || [],
-                          messageId: messageId  // 
+                          messageId: messageId 
                       } 
                   },
-                  { upsert: true, new: true }  // Insert if not exists
+                  { upsert: true, new: true } 
               );
 
               return {
@@ -159,9 +142,7 @@ app.get("/fetch-emails", async (req, res) => {
   }
 });
 function cleanReceivedDate(receivedDate) {
-  if (!receivedDate) return "";  // Prevent errors if date is undefined
-
-  //  Removes weekday names (e.g., "Tue Feb 18 2025" → "Feb 18 2025")
+  if (!receivedDate) return "";  
   return receivedDate.replace(/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)\s*/i, '');
 }
 
